@@ -1,50 +1,56 @@
 package com.deutsche.demo.service;
 
 import com.deutsche.demo.model.Employee;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import com.deutsche.demo.repository.EmployeeRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-//@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 public class EmployeeServiceTest {
-    @Autowired
-    private static EmployeeService service = new EmployeeService();
-    private static List<Employee> empList;
 
-    @BeforeAll
-    static void setUp() {
-        empList = service.getAllEmployees();
-    }
-//
-//    @AfterAll
-//    static void tearDown() {
-//        service = null;
-//    }
+    @Mock
+    private EmployeeRepository employeeRepository;
+
+    @InjectMocks
+    private EmployeeService employeeService;
 
     @Test
-    void testFetchAllEmployeesSize() {
-        assertEquals(6, empList.size());
+    public void testGetAllEmployees() {
+        List<Employee> mockEmployees = List.of(new Employee(10, "IT", 45000.00));
+        when(employeeRepository.findAll()).thenReturn(mockEmployees);
+
+        List<Employee> allEmployees = employeeService.getAllEmployees();
+        assertFalse(allEmployees.isEmpty());
     }
-
-//    @Test
-//    void testFetchAllEmployeesSizePositive() {
-//        assertNotEquals(0, empList.size());
-//    }
-//
-////    @Disabled
-//    @Test
-//    void testFetchAllEmployeesNotNull() {
-//        assertNotNull(empList);
-//    }
-//
-//    @Test
-//    void testFetchAllEmployeesNotEmpty() {
-//        assertFalse(empList.isEmpty());
-//    }
-
-
 }
+
+
+//package com.deutsche.demo.service;
+//
+//import org.junit.jupiter.api.BeforeAll;
+//import org.junit.jupiter.api.Test;
+//
+//import static org.junit.jupiter.api.Assertions.assertFalse;
+//
+//public class EmployeeServiceTest {
+//
+//    private static EmployeeService employeeService;
+//
+//    @BeforeAll
+//    public static void setUp() {
+//        employeeService = new EmployeeService();
+//    }
+//
+//    @Test
+//    public void testGetAllEmployees() {
+//        assertFalse(employeeService.getAllEmployees().isEmpty(), "Employee list should not be empty");
+//    }
+//}
