@@ -1,13 +1,16 @@
 package com.deutsche.demo.service;
 
+import com.deutsche.demo.exception.EmployeeNotFoundException;
 import com.deutsche.demo.model.Employee;
 import com.deutsche.demo.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 // Write business logic in this class
 // getEmployeeById() - What if the employee does not exist?
@@ -24,104 +27,78 @@ public class EmployeeService {
     EmployeeRepository employeeRepository;
 
     public List<Employee> getAllEmployees() {
+        LOG.info("Fetching all employees");
         return employeeRepository.findAll();
     }
 
     public Employee getEmployeeById(Integer id) {
-//        write your logic
-        return employeeRepository.findById(id).get();
+        LOG.info("Fetching employee by ID: {}", id);
+        Optional<Employee> employeeOptional = employeeRepository.findById(id);
+
+        if(employeeOptional.isPresent()){
+            return employeeOptional.get();
+        }
+        else{
+            throw new EmployeeNotFoundException(id);
+        }
+    }
+    public List<Employee> getEmployeeByName(String name){
+        LOG.info("Fetching employee by name: {}", name);
+        List<Employee> employee = employeeRepository.findByName(name);
+
+        if(employee.isEmpty()){
+            throw new EmployeeNotFoundException(name);
+        }
+        return employee;
+    }
+
+    public List<Employee> getEmployeeBySalary(Double salary){
+        LOG.info("Fetching employee by name: {}", salary);
+        List<Employee> employee = employeeRepository.findBySalary(salary);
+
+        if(employee.isEmpty()){
+            throw new EmployeeNotFoundException(salary);
+        }
+        return employee;
     }
 
     public Employee addEmployee(Employee employee) {
-//        write your logic
+        LOG.info("Attempting to add employee: {}", employee);
+
+        // NEW: Check if ID is not null and already exists
+        if (employee.getId() != null) {
+            Optional<Employee> existingEmployee = employeeRepository.findById(employee.getId());
+            if(existingEmployee.isPresent()){
+                throw new RuntimeException("Employee with id " + employee.getId() + " already exists!");
+            }
+        }
+
         return employeeRepository.save(employee);
     }
 
+
     public Employee updateEmployee(Employee employee) {
-//        write your logic
-        return employeeRepository.save(employee);
+        LOG.info("Attempting to update employee: {}", employee);
+        Optional<Employee> existingEmployee = employeeRepository.findById(employee.getId());
+
+        if(existingEmployee.isPresent()){
+            return employeeRepository.save(employee);
+        }
+        else{
+            throw new EmployeeNotFoundException(employee.getId());
+        }
     }
 
     public Employee deleteEmployee(Integer id) {
-        employeeRepository.deleteById(id);
-//        write your logic
-//        return the deleted employee object;
-        return null;
+        LOG.info("Attempting to delete employee with id: {}", id);
+        Optional<Employee> optionalEmployee = employeeRepository.findById(id);
+
+        if(optionalEmployee.isEmpty()){
+            throw new EmployeeNotFoundException(id);
+        }
+        else{
+            employeeRepository.deleteById(id);
+            return optionalEmployee.get();
+        }
     }
 }
-
-
-//package com.deutsche.demo.service;
-//
-//import com.deutsche.demo.model.Employee;
-//import com.deutsche.demo.repository.EmployeeRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-//
-//@Service
-//public class EmployeeService {
-//
-//    @Autowired
-//    EmployeeRepository empRepository;
-//
-//    public List<Employee> getAllEmployees() {
-//        return empRepository.findAll();
-//    }
-//
-//    public Employee getEmployeeById(Integer id) {
-//        return empRepository.findById(id).get();
-//    }
-//
-//    public Employee addEmployee(Employee employee) {
-//        return empRepository.save(employee);
-//    }
-//    public Employee updateEmployee(Employee employee) {
-//        return empRepository.save(employee);
-//    }
-//    public Employee deleteEmployee(Integer id) {
-//        empRepository.deleteById(id);
-/// /        return the deleted employee object;
-//        return null;
-//    }
-//}
-//
-//
-////package com.deutsche.demo.service;
-////
-////import com.deutsche.demo.model.Employee;
-////import com.deutsche.demo.repository.EmployeeRepository;
-////import org.springframework.beans.factory.annotation.Autowired;
-////import org.springframework.stereotype.Service;
-////
-////import java.util.ArrayList;
-////import java.util.Arrays;
-////import java.util.List;
-////
-////@Service
-////public class EmployeeService {
-////
-////    private List<Employee> tempEmpList = new ArrayList<>(
-////            Arrays.asList(
-////                    new Employee(101, "Sonu", 90000.00),
-////                    new Employee(101, "Sonu", 90000.00),
-////                    new Employee(101, "Sonu", 90000.00)));
-////
-////    public List<Employee> getAllEmployees() {
-////        System.out.println(tempEmpList.size());
-////        return tempEmpList;
-////    }
-////
-////    public Employee getEmployeeById(Integer id) {
-////        System.out.println(id);
-////        // write your logic
-////        return tempEmpList.get(0);
-////    }
-////
-////    public Employee addEmployee(Employee employee) {
-////        System.out.println(employee.toString());
-////        // write your logic
-////        return employee;
-////    }
-////}

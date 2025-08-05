@@ -1,6 +1,11 @@
 package com.deutsche.demo.model;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
+
 
 @Entity // mandotory
 @Table(name = "employees") // optional, but conditional
@@ -8,8 +13,17 @@ public class Employee {
 
     @Id // mandotory
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
+
+    @NotNull(message = "Name should be provided")
+    @NotBlank(message = "name cannot be empty")
+    @Size(min = 2, max = 50, message = "Name should be between 2 to 50 characters")
+    @Column(name = "name")
     private String name;
+
+    @Positive(message = "Salary should be more than 0")
+    @Column(name = "salary")
     private Double salary;
 
     public Employee() {

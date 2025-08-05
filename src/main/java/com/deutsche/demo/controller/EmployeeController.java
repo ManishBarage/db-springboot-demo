@@ -1,7 +1,9 @@
 package com.deutsche.demo.controller;
 
+import ch.qos.logback.core.joran.spi.EventPlayer;
 import com.deutsche.demo.model.Employee;
 import com.deutsche.demo.service.EmployeeService;
+import io.swagger.v3.oas.annotations.headers.Header;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 // methods in this class should not return raw business objects
@@ -19,6 +22,7 @@ import java.util.List;
 // access ui here -
 //http://localhost:8090/api/v1/swagger-ui/index.html
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("employees")
 public class EmployeeController {
@@ -36,88 +40,67 @@ public class EmployeeController {
 
     //    http://localhost:8090/api/v1/employees/101
     @GetMapping("/{id}")
-    public Employee getEmployeeById(@PathVariable(name = "id") Integer id) {
-        return employeeService.getEmployeeById(id);
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable(name = "id") Integer id) {
+        Employee employee = employeeService.getEmployeeById(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("message", "Employee with the id "+ id+ "returned successfully");
+        HttpStatus status = HttpStatus.OK;
+        ResponseEntity<Employee> response = new ResponseEntity<>(employee, headers, status);
+        return response;
     }
 
-//    //    http://localhost:8090/api/v1/employees/101
-//    @GetMapping("/{id}")
-//    public ResponseEntity<Employee> getEmployeeById(@PathVariable Integer id) {
-//        return ResponseEntity
-//                .ok()
-//                .header("message", "Employee with the id " + id + " fetched successfully.")
-//                .body(employeeService.getEmployeeById(id));
-//    }
 
+    // http://localhost:8090/api/v1/employees/name/{name}
+    @GetMapping("/name/{name}")
+    public ResponseEntity<List<Employee>> getEmployeeByName(@PathVariable(name = "name") String name) {
+        List<Employee> employee = employeeService.getEmployeeByName(name);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("message", "Employee with the name " + name + " returned successfully");
+        return new ResponseEntity<>(employee, headers, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/salary/{salary}")
+    public ResponseEntity<List<Employee>> getEmployeeByName(@PathVariable(name = "salary") Double salary) {
+        List<Employee> employee = employeeService.getEmployeeBySalary(salary);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("message", "Employee with the name " + salary + " returned successfully");
+        return new ResponseEntity<>(employee, headers, HttpStatus.OK);
+    }
 
     //    http://localhost:8090/api/v1/employees
     @PostMapping
-    public Employee addEmployee(@RequestBody Employee employee) {
-        return employeeService.addEmployee(employee);
+    public ResponseEntity<?> addEmployee(@Valid @RequestBody Employee employee) {
+        try {
+            Employee savedEmployee = employeeService.addEmployee(employee);
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("message", "Employee added successfully");
+            return new ResponseEntity<>(savedEmployee, headers, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error adding employee: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     //    http://localhost:8090/api/v1/employees
     @PutMapping
-    public Employee updateEmployee(@RequestBody Employee employee) {
-
-        return employeeService.updateEmployee(employee);
+    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) {
+        Employee updatedEmployee = employeeService.updateEmployee(employee);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("message","Employee updated successfully");
+        HttpStatus status = HttpStatus.OK;
+        ResponseEntity<Employee> response = new ResponseEntity<>(updatedEmployee, headers,status);
+        return response;
     }
 
     //    http://localhost:8090/api/v1/employees/101
     @DeleteMapping("/{id}")
-    public Employee deleteEmployee(@PathVariable(name = "id") Integer id) {
-
-        return employeeService.deleteEmployee(id);
+    public ResponseEntity<Employee> deleteEmployee(@PathVariable(name = "id") Integer id) {
+        Employee deletedEmployee = employeeService.deleteEmployee(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("message","Employee deleted successfully");
+        HttpStatus status = HttpStatus.OK;
+        ResponseEntity<Employee> response = new ResponseEntity<>(deletedEmployee, headers,status);
+        return response;
     }
 }
-
-
-//package com.deutsche.demo.controller;
-//
-//import com.deutsche.demo.model.Employee;
-//import com.deutsche.demo.service.EmployeeService;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-//@RestController
-//@RequestMapping("api")
-//public class EmployeeController {
-//
-/// /    private EmployeeService empService = new EmployeeService();
-//
-//    @Autowired
-//    private EmployeeService empService;
-//
-//    //    http://localhost:8080/api/emp
-//    @GetMapping("emp")
-//    public List<Employee> getAllEmployees() {
-//        return empService.getAllEmployees();
-//    }
-//
-//    //    http://localhost:8080/api/emp/101
-//    @GetMapping("emp/{id}")
-//    public Employee getEmployeeById(@PathVariable( name = "id") Integer id) {
-//        return empService.getEmployeeById(id);
-//    }
-//
-//    //    http://localhost:8080/api/emp
-//    @PostMapping("emp")
-//    public Employee addEmployee(@RequestBody Employee employee) {
-//        return empService.addEmployee(employee);
-//    }
-//
-/// /    public Object addEmployee() {
-/// /        return null;
-/// /    }
-/// /
-/// /    public Object updateEmployee() {
-/// /        return null;
-/// /    }
-/// /
-/// /    public Object deleteEmployee() {
-/// /        return null;
-/// /    }
-//
-//}

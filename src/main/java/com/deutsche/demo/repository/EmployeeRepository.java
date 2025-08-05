@@ -5,6 +5,8 @@ import com.deutsche.demo.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 //reference -
 // https://docs.spring.io/spring-data/jpa/docs/current-SNAPSHOT/reference/html/#jpa.query-methods.query-creation
 
@@ -24,5 +26,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+    public abstract List<Employee> findByName(String name);
+    public abstract List<Employee> findBySalary(Double salary);
 
 }
