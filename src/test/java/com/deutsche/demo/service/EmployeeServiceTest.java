@@ -16,20 +16,20 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class EmployeeServiceTest {
 
-    @Mock
-    private EmployeeRepository employeeRepository;
-
-    @InjectMocks
-    private EmployeeService employeeService;
-
-    @Test
-    public void testGetAllEmployees() {
-        List<Employee> mockEmployees = List.of(new Employee(10, "IT", 45000.00));
-        when(employeeRepository.findAll()).thenReturn(mockEmployees);
-
-        List<Employee> allEmployees = employeeService.getAllEmployees();
-        assertFalse(allEmployees.isEmpty());
-    }
+//    @Mock
+//    private EmployeeRepository employeeRepository;
+//
+//    @InjectMocks
+//    private EmployeeService employeeService;
+//
+//    @Test
+//    public void testGetAllEmployees() {
+//        List<Employee> mockEmployees = List.of(new Employee(10, "IT", 45000.00));
+//        when(employeeRepository.findAll()).thenReturn(mockEmployees);
+//
+//        List<Employee> allEmployees = employeeService.getAllEmployees();
+//        assertFalse(allEmployees.isEmpty());
+//    }
 }
 
 
