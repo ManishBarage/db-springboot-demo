@@ -1,40 +1,14 @@
 version: '3.8'
 
 services:
-  db:
-    image: mysql:8
-    container_name: deutsche-mysql
-    environment:
-      MYSQL_DATABASE: db
-      MYSQL_ROOT_PASSWORD: root
-    volumes:
-      - db_data:/var/lib/mysql
-    networks:
-      - springnet
-
   app:
     image: manishbarage/deutsche-springboot-demo:latest
-    container_name: deutsche-app
-    depends_on:
-      - db
     ports:
-      - "8080:8090"  # maps container 8090 to host 8080
+      - "8090:8090"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       SERVER_PORT: 8090
       SERVER_SERVLET_CONTEXT_PATH: /api/v1
       SPRING_APPLICATION_NAME: deutsche-springboot-demo
       LOGGING_FILE_NAME: app.log
-    networks:
-      - springnet
-    restart: on-failure  # optionally auto-restart on connection issues
-
-volumes:
-  db_data:
-
-networks:
-  springnet:
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
+    restart: unless-stopped
